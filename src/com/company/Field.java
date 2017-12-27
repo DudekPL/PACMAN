@@ -67,4 +67,9 @@ public class Field {
         right = b;
     }
 
+    public boolean isEmpty() {
+        if(inside == Inside.EMPTY) return true;
+        else return false;
+    }
+
 }

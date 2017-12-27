@@ -76,6 +76,7 @@ class GhostSimpleView extends JComponent implements Observer {
     private Color color;
     private long timeofchange;
     private float timeforchange;
+    private int fieldsize = 40;
     private int ghostsize = 40;
     private int prevposx;
     private int prevposy;
@@ -83,6 +84,7 @@ class GhostSimpleView extends JComponent implements Observer {
     public GhostSimpleView(GhostModel m, Color c, int sz, int tfc) {
         model = m;
         color = c;
+        fieldsize = sz;
         ghostsize = sz;
         prevposx = m.getPosx();
         prevposy = m.getPosy();
@@ -94,10 +96,10 @@ class GhostSimpleView extends JComponent implements Observer {
         Graphics2D g2 = (Graphics2D) g;
         float time = System.currentTimeMillis() - timeofchange;
         if (time > timeforchange) time = timeforchange;
-        float posx = (float) ghostsize * (float) (model.getPosx() - prevposx) * (time / timeforchange);
-        posx = posx + prevposx * ghostsize;
-        float posy = (float) ghostsize * (float) (model.getPosy() - prevposy) * (time / timeforchange);
-        posy = posy + prevposy * ghostsize;
+        float posx = (float) fieldsize * (float) (model.getPosx() - prevposx) * (time / timeforchange);
+        posx = posx + prevposx * fieldsize;
+        float posy = (float) fieldsize * (float) (model.getPosy() - prevposy) * (time / timeforchange);
+        posy = posy + prevposy * fieldsize;
         Rectangle2D ghost = new Rectangle2D.Float(posx, posy, ghostsize, ghostsize);
         g2.setPaint(color);
         g2.fill(ghost);
@@ -132,13 +134,13 @@ class GhostSimpleView extends JComponent implements Observer {
     }
 }
 
-class GhostControler {
+class GhostController {
     protected GhostModel model;
     protected Map map;
     protected int respx;
     protected int respy;
 
-    public GhostControler(GhostModel gm, Map m, int rx, int ry) {
+    public GhostController(GhostModel gm, Map m, int rx, int ry) {
         model = gm;
         map = m;
         respx = rx;
@@ -176,12 +178,12 @@ class GhostControler {
 public class Ghost {
     public GhostModel model;
     public GhostSimpleView view;
-    public GhostControler controler;
+    public GhostController controller;
 
     public Ghost(Map m, int x, int y, Color c, int size, int tfc) {
         model = new GhostModel(x, y);
         view = new GhostSimpleView(model, c, size, tfc);
-        controler = new GhostControler(model, m, x, y);
+        controller = new GhostController(model, m, x, y);
         model.addObserver(view);
     }
 }

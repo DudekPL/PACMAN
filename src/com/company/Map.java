@@ -148,6 +148,11 @@ class MapModel {
         fields[x + 2][y].setUp(true);
         fields[x + 3][y].setUp(true);
     }
+
+    public boolean isEmpty() {
+        for (Field[] row:fields) for (Field f: row) if (!f.isEmpty()) return false;
+        return true;
+    }
 }
 
 class MapSimpleView extends JComponent {

@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
-            Game g = new Game();
+            GameModel g = new GameModel();
             JFrame fr = new JFrame();
             fr.add(g);
             fr.pack();
