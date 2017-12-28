@@ -34,10 +34,10 @@ class PacmanController extends GhostController {
         Direction d = ((PacmanModel)model).getNextmove();
         int x = model.getPosx();
         int y = model.getPosy();
-        if (d == Direction.RIGHT && map.model.field(x,y).canRight()) {model.changePos(d); return;}
-        if (d == Direction.LEFT && map.model.field(x,y).canLeft()) {model.changePos(d); return;}
-        if (d == Direction.DOWN && map.model.field(x,y).canDown()) {model.changePos(d); return;}
-        if (d == Direction.UP && map.model.field(x,y).canUp()) {model.changePos(d); return;}
+        if (d == Direction.RIGHT && map.model.field(x,y).model.canRight()) {model.changePos(d); return;}
+        if (d == Direction.LEFT && map.model.field(x,y).model.canLeft()) {model.changePos(d); return;}
+        if (d == Direction.DOWN && map.model.field(x,y).model.canDown()) {model.changePos(d); return;}
+        if (d == Direction.UP && map.model.field(x,y).model.canUp()) {model.changePos(d); return;}
     }
     public PacmanController(PacmanModel pm, Map m, int rx, int ry) {
         super(pm, m, rx, ry);

@@ -1,17 +1,22 @@
 package com.company;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
+
 enum Inside {
     EMPTY, DOT, BIGDOT, FRUIT;
 }
 
-public class Field {
+class FieldModel {
     private Inside inside;
     private boolean up;
     private boolean down;
     private boolean right;
     private boolean left;
 
-    public Field(Inside i, boolean u, boolean d, boolean r, boolean l) {
+    public FieldModel(Inside i, boolean u, boolean d, boolean r, boolean l) {
         inside = i;
         up = u;
         down = d;
@@ -19,7 +24,7 @@ public class Field {
         left = l;
     }
 
-    public Field() {
+    public FieldModel() {
         inside = Inside.DOT;
         up = true;
         down = true;
@@ -72,4 +77,54 @@ public class Field {
         else return false;
     }
 
+}
+
+class FieldSimpleView extends JComponent {
+    private FieldModel model;
+    public static final int FIELD_SIZE = 40;
+    private static final int WALL_WIDTH = 5;
+
+    public FieldSimpleView(FieldModel m) {
+        model = m;
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        int r = WALL_WIDTH/2;
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setPaint(Color.BLACK);
+        g2.fill(new Rectangle2D.Float(0, 0, FIELD_SIZE, FIELD_SIZE));
+        g2.setPaint(Color.BLUE);
+        if (!model.canUp())
+            g2.fill(new Rectangle2D.Float(0, 0, FIELD_SIZE, WALL_WIDTH));
+        if (!model.canDown())
+            g2.fill(new Rectangle2D.Float(0, FIELD_SIZE - WALL_WIDTH, FIELD_SIZE, WALL_WIDTH));
+        if (!model.canLeft())
+            g2.fill(new Rectangle2D.Float(0, 0, WALL_WIDTH, FIELD_SIZE));
+        if (!model.canRight())
+            g2.fill(new Rectangle2D.Float(FIELD_SIZE - WALL_WIDTH, 0, WALL_WIDTH, FIELD_SIZE));
+        g2.setPaint(Color.WHITE);
+        if (model.getInside() == Inside.DOT)
+            g2.fill(new Ellipse2D.Float((float)0.5*FIELD_SIZE - r, (float)0.5 * FIELD_SIZE - r, 2 * r, 2 * r));
+        if (model.getInside() == Inside.BIGDOT)
+            g2.fill(new Ellipse2D.Float((float) 0.5 * FIELD_SIZE - 2 * r, (float) 0.5 * FIELD_SIZE - 2 * r, 4 * r, 4 * r));
+        g2.setPaint(Color.RED);
+        if (model.getInside() == Inside.FRUIT)
+            g2.fill(new Ellipse2D.Float((float) 0.5 * FIELD_SIZE - 2 * r, (float) 0.5 * FIELD_SIZE - 2 * r, 4 * r, 4 * r));
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(FIELD_SIZE, FIELD_SIZE);
+    }
+}
+
+public class Field {
+    public FieldModel model;
+    public FieldSimpleView view;
+
+    public Field() {
+        model = new FieldModel();
+        view = new FieldSimpleView(model);
+    }
 }

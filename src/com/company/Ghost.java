@@ -72,6 +72,7 @@ class GhostModel extends Observable {
 }
 
 class GhostSimpleView extends JComponent implements Observer {
+    private GameSimpleView gameview;
     private GhostModel model;
     private Color color;
     private long timeofchange;
@@ -80,6 +81,8 @@ class GhostSimpleView extends JComponent implements Observer {
     private int ghostsize = 40;
     private int prevposx;
     private int prevposy;
+    private int actposy;
+    private int actposx;
 
     public GhostSimpleView(GhostModel m, Color c, int sz, int tfc) {
         model = m;
@@ -90,19 +93,31 @@ class GhostSimpleView extends JComponent implements Observer {
         prevposy = m.getPosy();
         timeforchange = tfc;
         timeofchange = System.currentTimeMillis();
+        actposx = prevposx;
+        actposy = prevposy;
+    }
+
+    public void display() {
+        setLocation(actposx, actposy);
     }
 
     public void paintComponent(Graphics g) {
+        display();
         Graphics2D g2 = (Graphics2D) g;
         float time = System.currentTimeMillis() - timeofchange;
         if (time > timeforchange) time = timeforchange;
         float posx = (float) fieldsize * (float) (model.getPosx() - prevposx) * (time / timeforchange);
-        posx = posx + prevposx * fieldsize;
+        actposx = (int)posx + prevposx * fieldsize;
         float posy = (float) fieldsize * (float) (model.getPosy() - prevposy) * (time / timeforchange);
-        posy = posy + prevposy * fieldsize;
-        Rectangle2D ghost = new Rectangle2D.Float(posx, posy, ghostsize, ghostsize);
+        actposy = (int)posy + prevposy * fieldsize;
+        Rectangle2D ghost = new Rectangle2D.Float(0, 0, ghostsize, ghostsize);
         g2.setPaint(color);
         g2.fill(ghost);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(ghostsize, ghostsize);
     }
 
     public void update(Observable obs, Object obj) {
@@ -132,6 +147,11 @@ class GhostSimpleView extends JComponent implements Observer {
             }
         }
     }
+
+    public void setGameview(GameSimpleView gameview) {
+        this.gameview = gameview;
+    }
+
 }
 
 class GhostController {
