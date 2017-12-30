@@ -13,6 +13,7 @@ class PacmanModel extends GhostModel {
 
     public void setNextmove(Direction nextmove) {
         this.nextmove = nextmove;
+        System.out.println("sdf");
     }
 
     public Direction getNextmove() {
@@ -25,6 +26,8 @@ class PacmanSimpleView extends GhostSimpleView implements Observer {
     public PacmanSimpleView(PacmanModel m, int sz, int tfc) {
         super(m, Color.YELLOW, sz, tfc);
     }
+
+
 }
 
 
@@ -39,16 +42,28 @@ class PacmanController extends GhostController {
         if (d == Direction.DOWN && map.model.field(x,y).model.canDown()) {model.changePos(d); return;}
         if (d == Direction.UP && map.model.field(x,y).model.canUp()) {model.changePos(d); return;}
     }
+
     public PacmanController(PacmanModel pm, Map m, int rx, int ry) {
         super(pm, m, rx, ry);
     }
-}
+
+    public void setnextMove(Direction d){
+        int x = model.getPosx();
+        int y = model.getPosy();
+        if (d == Direction.RIGHT && !map.model.field(x,y).model.canRight()) return;
+        if (d == Direction.LEFT && !map.model.field(x,y).model.canLeft()) return;
+        if (d == Direction.DOWN && !map.model.field(x,y).model.canDown()) return;
+        if (d == Direction.UP && !map.model.field(x,y).model.canUp()) return;
+        ((PacmanModel)model).setNextmove(d);}
+    }
 
 
 public class Pacman{
     public PacmanModel model;
     public PacmanSimpleView view;
     public PacmanController controller;
+
+
 
     public Pacman(Map m, int x, int y, int size, int tfc) {
         model = new PacmanModel(x, y);

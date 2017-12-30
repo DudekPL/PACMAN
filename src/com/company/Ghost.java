@@ -97,19 +97,19 @@ class GhostSimpleView extends JComponent implements Observer {
         actposy = prevposy;
     }
 
-    public void display() {
+    protected void display() {
         setLocation(actposx, actposy);
-    }
-
-    public void paintComponent(Graphics g) {
-        display();
-        Graphics2D g2 = (Graphics2D) g;
         float time = System.currentTimeMillis() - timeofchange;
         if (time > timeforchange) time = timeforchange;
         float posx = (float) fieldsize * (float) (model.getPosx() - prevposx) * (time / timeforchange);
         actposx = (int)posx + prevposx * fieldsize;
         float posy = (float) fieldsize * (float) (model.getPosy() - prevposy) * (time / timeforchange);
         actposy = (int)posy + prevposy * fieldsize;
+    }
+
+    public void paintComponent(Graphics g) {
+        display();
+        Graphics2D g2 = (Graphics2D) g;
         Rectangle2D ghost = new Rectangle2D.Float(0, 0, ghostsize, ghostsize);
         g2.setPaint(color);
         g2.fill(ghost);
@@ -120,6 +120,7 @@ class GhostSimpleView extends JComponent implements Observer {
         return new Dimension(ghostsize, ghostsize);
     }
 
+    @Override
     public void update(Observable obs, Object obj) {
         if (obs == model) {
             timeofchange = System.currentTimeMillis();

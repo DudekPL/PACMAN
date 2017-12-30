@@ -169,7 +169,7 @@ class MapSimpleView extends JLayeredPane {
                 model.field(j, i).view.setFocusable(false);
             }
         setOpaque(false);
-
+        setFocusable(false);
     }
 
     @Override
