@@ -20,8 +20,8 @@ class GameModel extends Observable{
         paused = false;
         map = new Map();
         ghosts = new ArrayList<>();
-        ghosts.add(new Ghost(map, 7, 4, Color.RED, map.view.FIELD_SIZE, 1000));
-        player = new Pacman(map, 8, 6, map.view.FIELD_SIZE, 1000);
+        ghosts.add(new Ghost(map, 7, 4, Color.RED, map.view.FIELD_SIZE, 800));
+        player = new Pacman(map, 8, 6, map.view.FIELD_SIZE, 800);
         map.model.field(8, 6).model.setInside(Inside.EMPTY);
     }
 
@@ -71,7 +71,6 @@ class GameSimpleView extends JDesktopPane{
             add(gh.view);
             gh.view.display();
             moveToFront(gh.view);
-            gh.view.setGameview(this);
         }
         add(model.player.view);
         model.player.view.display();

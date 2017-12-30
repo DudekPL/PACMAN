@@ -20,7 +20,7 @@ public class Main {
                 g.view.repaint();
                 g.model.addPoints(1);
             });
-            Timer t2 = new Timer(1000, event -> g.model.player.controller.move());
+            Timer t2 = new Timer(800, event -> g.model.player.controller.move());
             t.start();
             t2.start();
         });
