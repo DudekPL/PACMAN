@@ -27,7 +27,6 @@ public class LifeIcon extends JComponent implements Observer {
         setLocation(posx, posy);
         Graphics2D g2 = (Graphics2D) g;
         ImageIcon img = new ImageIcon("img/Icons/LifeIcon.png");
-        System.out.println(img.getIconHeight());
         g2.scale(fieldsize/((float)img.getIconWidth()), fieldsize/((float)img.getIconHeight()));
         for (int i = 0; i < lives; i++) {
             g2.drawImage(img.getImage(), i*img.getIconHeight()/2,0 ,null);

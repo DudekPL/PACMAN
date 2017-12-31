@@ -78,6 +78,20 @@ class FieldModel {
 
 }
 
+class FieldController {
+    private FieldModel model;
+
+    public FieldController(FieldModel m) {model = m;}
+    public Inside eat(int delay) {
+        Inside pom = model.getInside();
+        Timer t = new Timer(0, event->model.setInside(Inside.EMPTY));
+        t.setInitialDelay(delay);
+        t.setRepeats(false);
+        t.start();
+        return pom;
+    }
+}
+
 class FieldSimpleView extends JComponent {
     private FieldModel model;
     public static final int FIELD_SIZE = 40;
@@ -123,9 +137,11 @@ class FieldSimpleView extends JComponent {
 public class Field {
     public FieldModel model;
     public FieldSimpleView view;
+    public FieldController controller;
 
     public Field() {
         model = new FieldModel();
         view = new FieldSimpleView(model);
+        controller = new FieldController(model);
     }
 }

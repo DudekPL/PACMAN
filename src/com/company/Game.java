@@ -11,6 +11,7 @@ class GameModel extends Observable{
     Pacman player;
     List<Ghost> ghosts;
     private boolean paused;
+    long timeforeat,timeformove,timeforresp;
 
     public GameModel(long timeformove, long  timeforeat, long timeforresp) {
         score = 0;
@@ -21,6 +22,9 @@ class GameModel extends Observable{
         ghosts.add(new Ghost(map, 7, 4, Color.RED, map.view.FIELD_SIZE, timeformove, timeforeat, timeforresp));
         player = new Pacman(map, 8, 6, map.view.FIELD_SIZE, timeformove);
         map.model.field(8, 6).model.setInside(Inside.EMPTY);
+        this.timeforeat = timeforeat;
+        this.timeformove = timeformove;
+        this.timeforresp = timeforresp;
     }
 
     public int getLives() {return lives;}
@@ -66,7 +70,20 @@ class GameController {
         model.setPaused(!model.isPaused());
     }
     public void eat() {
-        model.map
+        Inside i = model.map.controller.eat(model.player.model.getPosx(), model.player.model.getPosy(), (int)model.timeformove);
+        switch (i) {
+            case DOT: model.addPoints(10);
+                break;
+            case BIGDOT: model.addPoints(10);
+                for (Ghost g: model.ghosts) {
+                    javax.swing.Timer t = new javax.swing.Timer(0, event->g.controller.makeEatable());
+                    t.setInitialDelay((int)model.timeformove);
+                    t.setRepeats(false);
+                    t.start();
+                }
+                break;
+            case FRUIT: model.addPoints(50);
+        }
     }
 }
 
@@ -74,6 +91,7 @@ public class Game implements Runnable {
     public GameModel model;
     public GameSimpleView view;
     public GameController controller;
+    private boolean ended = false;
     private long timeformove, timeforresp, timeforeat;
 
     public Game(long timeformove, long timeforeat, long timeforresp) {
@@ -88,29 +106,28 @@ public class Game implements Runnable {
     @Override
     public void run() {
         Timer chasingtime = new Timer();
-        chasingtime.schedule(new GhostTask(model, State.CHASING),0, timeformove);
+        chasingtime.schedule(new GhostTask(this, State.CHASING),0, timeformove);
         Timer eatingtime = new Timer();
-        eatingtime.schedule(new GhostTask(model, State.EATABLE),0, (long)(1.3 * timeformove));
+        eatingtime.schedule(new GhostTask(this, State.EATABLE),0, (long)(1.3 * timeformove));
         Timer resptime = new Timer();
-        resptime.schedule(new GhostTask(model, State.RESPAWNING),0, timeformove);
+        resptime.schedule(new GhostTask(this, State.RESPAWNING),0, timeformove);
         Timer pacmantime = new Timer();
-        pacmantime.schedule(new PlayerTask(model), 0, timeformove);
-
+        pacmantime.schedule(new PlayerTask(this), 0, timeformove);
     }
 }
 
 class GhostTask extends TimerTask{
-    private GameModel gm;
+    private Game gm;
     private State state;
 
     @Override
     public void run(){
-        for (Ghost g: gm.ghosts) {
+        for (Ghost g: gm.model.ghosts) {
             if (g.model.getStatus() == state) g.controller.move();
         }
     }
 
-    public GhostTask(GameModel g, State s){
+    public GhostTask(Game g, State s){
         super();
         gm = g;
         state = s;
@@ -118,15 +135,15 @@ class GhostTask extends TimerTask{
 }
 
 class PlayerTask extends TimerTask {
-    private GameModel gm;
+    private Game gm;
 
     @Override
     public void run() {
-        gm.player.controller.move();
-
+        gm.model.player.controller.move();
+        gm.controller.eat();
     }
 
-    public PlayerTask(GameModel g) {
+    public PlayerTask(Game g) {
         super();
         gm = g;
     }

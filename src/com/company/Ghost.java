@@ -74,8 +74,14 @@ class GhostModel extends Observable {
         return status;
     }
 
-    public void setStatus(State s) {
-        status = s;
+    public void makeEatable() {
+        status = State.EATABLE;
+        Timer t = new Timer(0, event-> {if (status == State.EATABLE) status=State.CHASING;});
+        t.setInitialDelay((int)timeforrespawning);
+        t.setRepeats(false);
+        t.start();
+        setChanged();
+        notifyObservers(Direction.NONE);
     }
 }
 
@@ -111,6 +117,10 @@ class GhostController {
         if (model.getStatus() == State.EATABLE) d = nextMoveEatable();
         if (model.getStatus() == State.RESPAWNING) d = nextMoveRespawning();
         model.changePos(d);
+    }
+
+    public void makeEatable() {
+        if (model.getStatus() != State.RESPAWNING) model.makeEatable();
     }
 
     public boolean collided() {

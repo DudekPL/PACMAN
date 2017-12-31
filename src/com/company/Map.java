@@ -160,7 +160,7 @@ class MapController {
     private MapModel model;
 
     public MapController(MapModel m) {model = m;}
-    public int eat(int x, int y)
+    public Inside eat(int x, int y, int delay) {return model.field(x, y).controller.eat(delay);}
 }
 
 class MapSimpleView extends JLayeredPane {
@@ -189,9 +189,11 @@ class MapSimpleView extends JLayeredPane {
 public class Map {
     public MapModel model;
     public MapSimpleView view;
+    public MapController controller;
 
     public Map() {
         model = new MapModel();
         view = new MapSimpleView(model);
+        controller = new MapController(model);
     }
 }
