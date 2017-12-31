@@ -1,6 +1,9 @@
 package com.company;
 
+import javax.sound.sampled.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -31,6 +34,19 @@ class GameModel extends Observable{
 
     public void lostLive() {
         lives = lives - 1;
+        try {
+            File soundFile = new File("wav/pacman_death.wav");
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioIn);
+            clip.start();
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        }
         if (lives < 1) {
             endGame();
             return;
@@ -84,6 +100,26 @@ class GameController {
                 break;
             case FRUIT: model.addPoints(50);
         }
+        if(i != Inside.EMPTY) {
+            javax.swing.Timer t = new javax.swing.Timer(0, event->{
+                try {
+                    File soundFile = new File("wav/pacman_eatfruit.wav");
+                    AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+                    Clip clip = AudioSystem.getClip();
+                    clip.open(audioIn);
+                    clip.start();
+                } catch (UnsupportedAudioFileException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (LineUnavailableException e) {
+                    e.printStackTrace();
+                }
+            });
+            t.setInitialDelay((int)model.timeformove);
+            t.setRepeats(false);
+            t.start();
+        }
     }
 }
 
@@ -128,9 +164,10 @@ class GhostTask extends TimerTask{
 
     @Override
     public void run(){
-        for (Ghost g: gm.model.ghosts) {
-            if (g.model.getStatus() == state) g.controller.move();
-        }
+        if (!gm.model.isPaused())
+            for (Ghost g: gm.model.ghosts) {
+                if (g.model.getStatus() == state) g.controller.move();
+            }
     }
 }
 
@@ -144,14 +181,16 @@ class PlayerTask extends TimerTask {
 
     @Override
     public void run() {
-        gm.model.player.controller.move();
-        gm.controller.eat();
-        if (gm.model.map.model.isEmpty()) {
-            gm.model.map.model.init();
-            for (Ghost g: gm.model.ghosts) {
-                g.controller.respawn();
+        if (!gm.model.isPaused()) {
+            gm.model.player.controller.move();
+            gm.controller.eat();
+            if (gm.model.map.model.isEmpty()) {
+                gm.model.map.model.init();
+                for (Ghost g : gm.model.ghosts) {
+                    g.controller.respawn();
+                }
+                gm.model.player.controller.respawn();
             }
-            gm.model.player.controller.respawn();
         }
     }
 }

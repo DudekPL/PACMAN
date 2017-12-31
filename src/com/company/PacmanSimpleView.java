@@ -22,7 +22,7 @@ public class PacmanSimpleView extends GhostSimpleView implements Observer {
         if (direction == Direction.DOWN) theta = Math.PI / 2;
         g2.rotate(theta, fieldsize/2, fieldsize/2);
         display();
-        int toa = 800;
+        int toa = 400;
         String path = "img/Pacman/pacman1.png";
         long t = System.currentTimeMillis() % toa;
         if (t>toa/4) path = "img/Pacman/pacman2.png";

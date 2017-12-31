@@ -29,6 +29,12 @@ class PacmanController extends GhostController {
     }
 
     @Override
+    public void respawn() {
+        ((PacmanModel)model).setNextmove(Direction.NONE);
+        super.respawn();
+    }
+
+    @Override
     public void move() {
         Direction d = ((PacmanModel)model).getNextmove();
         int x = model.getPosx();
@@ -46,8 +52,9 @@ class PacmanController extends GhostController {
         if (d == Direction.LEFT && !map.model.field(x,y).model.canLeft()) return;
         if (d == Direction.DOWN && !map.model.field(x,y).model.canDown()) return;
         if (d == Direction.UP && !map.model.field(x,y).model.canUp()) return;
-        ((PacmanModel)model).setNextmove(d);}
+        ((PacmanModel)model).setNextmove(d);
     }
+}
 
 
 public class Pacman{
