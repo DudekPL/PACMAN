@@ -10,8 +10,8 @@ class GameModel extends Observable{
     Map map;
     Pacman player;
     List<Ghost> ghosts;
-    private boolean paused;
     long timeforeat,timeformove,timeforresp;
+    private boolean paused;
 
     public GameModel(long timeformove, long  timeforeat, long timeforresp) {
         score = 0;
@@ -120,31 +120,38 @@ class GhostTask extends TimerTask{
     private Game gm;
     private State state;
 
+    public GhostTask(Game g, State s){
+        super();
+        gm = g;
+        state = s;
+    }
+
     @Override
     public void run(){
         for (Ghost g: gm.model.ghosts) {
             if (g.model.getStatus() == state) g.controller.move();
         }
     }
-
-    public GhostTask(Game g, State s){
-        super();
-        gm = g;
-        state = s;
-    }
 }
 
 class PlayerTask extends TimerTask {
     private Game gm;
 
+    public PlayerTask(Game g) {
+        super();
+        gm = g;
+    }
+
     @Override
     public void run() {
         gm.model.player.controller.move();
         gm.controller.eat();
-    }
-
-    public PlayerTask(Game g) {
-        super();
-        gm = g;
+        if (gm.model.map.model.isEmpty()) {
+            gm.model.map.model.init();
+            for (Ghost g: gm.model.ghosts) {
+                g.controller.respawn();
+            }
+            gm.model.player.controller.respawn();
+        }
     }
 }

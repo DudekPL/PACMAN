@@ -93,9 +93,9 @@ class FieldController {
 }
 
 class FieldSimpleView extends JComponent {
-    private FieldModel model;
     public static final int FIELD_SIZE = 40;
     private static final int WALL_WIDTH = 5;
+    private FieldModel model;
 
     public FieldSimpleView(FieldModel m) {
         model = m;

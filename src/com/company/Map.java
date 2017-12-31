@@ -13,11 +13,12 @@ class MapModel {
         sizex = 18;
         sizey = 9;
         fields = new Field[18][9];
+        for (int i = 0; i < 18; i++) for (int j = 0; j < 9; j++) fields[i][j] = new Field();
         init();
     }
 
     public void init(){
-        for (int i = 0; i < 18; i++) for (int j = 0; j < 9; j++) fields[i][j] = new Field();
+        for (int i = 0; i < 18; i++) for (int j = 0; j < 9; j++) fields[i][j].model.setInside(Inside.DOT);
         for (Field f : fields[0]) f.model.setLeft(false);
         for (Field f : fields[17]) f.model.setRight(false);
         for (int i = 0; i < 18; i++) {
@@ -164,9 +165,8 @@ class MapController {
 }
 
 class MapSimpleView extends JLayeredPane {
-    private MapModel model;
     public static final int FIELD_SIZE = 40;
-    private static final int WALL_WIDTH = 5;
+    private MapModel model;
 
     public MapSimpleView(MapModel m) {
         model = m;

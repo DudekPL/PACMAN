@@ -129,6 +129,8 @@ class GhostController {
         model.respawn(respx, respy);
         return point;
     }
+
+    public void respawn() {model.respawn(respx, respy);}
 }
 
 public class Ghost {

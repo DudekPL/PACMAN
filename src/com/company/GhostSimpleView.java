@@ -73,9 +73,9 @@ public class GhostSimpleView extends JComponent implements Observer {
             img = new ImageIcon(pathbuild.toString());
         }
         if (status == State.EATABLE) {
-            if(System.currentTimeMillis() - timeofeating > 0.8*model.timeforeating) {
-                long t = System.currentTimeMillis() % 200;
-                if (t>100) img = new ImageIcon("img/Ghosts/Eatable/2.png");
+            if(System.currentTimeMillis() - timeofeating > 0.6*model.timeforeating) {
+                long t = System.currentTimeMillis() % 800;
+                if (t>400) img = new ImageIcon("img/Ghosts/Eatable/2.png");
             }
         }
         g2.scale(fieldsize/((float)img.getIconWidth()), fieldsize/((float)img.getIconHeight()));
@@ -92,7 +92,7 @@ public class GhostSimpleView extends JComponent implements Observer {
         if (obs == model) {
             timeofchange = System.currentTimeMillis();
             if(((GhostModel)obs).getStatus() != State.EATABLE)  timeofeating = 0;
-            else timeofeating = System.currentTimeMillis();
+            else if (timeofeating == 0) timeofeating = System.currentTimeMillis();
             switch ((Direction) obj) {
                 case UP:
                     prevposy = model.getPosy() + 1;
