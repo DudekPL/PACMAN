@@ -6,7 +6,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
 enum Inside {
-    EMPTY, DOT, BIGDOT, FRUIT;
+    EMPTY, DOT, BIGDOT, FRUIT
 }
 
 class FieldModel {
@@ -73,8 +73,7 @@ class FieldModel {
     }
 
     public boolean isEmpty() {
-        if(inside == Inside.EMPTY) return true;
-        else return false;
+        return (inside == Inside.EMPTY);
     }
 
 }
@@ -108,9 +107,11 @@ class FieldSimpleView extends JComponent {
             g2.fill(new Ellipse2D.Float((float)0.5*FIELD_SIZE - r, (float)0.5 * FIELD_SIZE - r, 2 * r, 2 * r));
         if (model.getInside() == Inside.BIGDOT)
             g2.fill(new Ellipse2D.Float((float) 0.5 * FIELD_SIZE - 2 * r, (float) 0.5 * FIELD_SIZE - 2 * r, 4 * r, 4 * r));
-        g2.setPaint(Color.RED);
-        if (model.getInside() == Inside.FRUIT)
-            g2.fill(new Ellipse2D.Float((float) 0.5 * FIELD_SIZE - 2 * r, (float) 0.5 * FIELD_SIZE - 2 * r, 4 * r, 4 * r));
+        if (model.getInside() == Inside.FRUIT) {
+            ImageIcon img = new ImageIcon("img/Icons/Cherry.png");
+            g2.scale(FIELD_SIZE/((float)img.getIconWidth()), FIELD_SIZE/((float)img.getIconHeight()));
+            g2.drawImage(img.getImage(), 0, 0, null);
+        }
     }
 
     @Override

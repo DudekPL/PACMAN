@@ -26,10 +26,11 @@ public class LifeIcon extends JComponent implements Observer {
     protected void paintComponent(Graphics g) {
         setLocation(posx, posy);
         Graphics2D g2 = (Graphics2D) g;
-        g2.setPaint(Color.RED);
-        int r = icosize/2;
+        ImageIcon img = new ImageIcon("img/Icons/LifeIcon.png");
+        System.out.println(img.getIconHeight());
+        g2.scale(fieldsize/((float)img.getIconWidth()), fieldsize/((float)img.getIconHeight()));
         for (int i = 0; i < lives; i++) {
-            g2.fill(new Ellipse2D.Float((float) ((float)i + 0.5) * fieldsize - 2 * r, (float) 0.5 * fieldsize - 2 * r, 4 * r, 4 * r));
+            g2.drawImage(img.getImage(), i*img.getIconHeight()/2,0 ,null);
         }
     }
 

@@ -2,9 +2,6 @@ package com.company;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.Color;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 
 class MapModel {
     private int sizex;
@@ -16,6 +13,10 @@ class MapModel {
         sizex = 18;
         sizey = 9;
         fields = new Field[18][9];
+        init();
+    }
+
+    public void init(){
         for (int i = 0; i < 18; i++) for (int j = 0; j < 9; j++) fields[i][j] = new Field();
         for (Field f : fields[0]) f.model.setLeft(false);
         for (Field f : fields[17]) f.model.setRight(false);
@@ -153,6 +154,13 @@ class MapModel {
         for (Field[] row:fields) for (Field f: row) if (!f.model.isEmpty()) return false;
         return true;
     }
+}
+
+class MapController {
+    private MapModel model;
+
+    public MapController(MapModel m) {model = m;}
+    public int eat(int x, int y)
 }
 
 class MapSimpleView extends JLayeredPane {

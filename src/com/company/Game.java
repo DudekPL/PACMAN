@@ -1,27 +1,25 @@
 package com.company;
 
-import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Observable;
 
 class GameModel extends Observable{
     int score;
     int lives;
-    private boolean paused;
     Map map;
     Pacman player;
     List<Ghost> ghosts;
+    private boolean paused;
 
-    public GameModel() {
+    public GameModel(long timeformove, long  timeforeat, long timeforresp) {
         score = 0;
         lives = 3;
         paused = false;
         map = new Map();
         ghosts = new ArrayList<>();
-        ghosts.add(new Ghost(map, 7, 4, Color.RED, map.view.FIELD_SIZE, 800));
-        player = new Pacman(map, 8, 6, map.view.FIELD_SIZE, 800);
+        ghosts.add(new Ghost(map, 7, 4, Color.RED, map.view.FIELD_SIZE, timeformove, timeforeat, timeforresp));
+        player = new Pacman(map, 8, 6, map.view.FIELD_SIZE, timeformove);
         map.model.field(8, 6).model.setInside(Inside.EMPTY);
     }
 
@@ -57,54 +55,6 @@ class GameModel extends Observable{
     public void endGame() {}
 }
 
-class GameSimpleView extends JDesktopPane{
-    private GameModel model;
-
-    public GameSimpleView(Game g) {
-        GameModel m=g.model;
-        setLayout(new FlowLayout());
-        model = m;
-        setDesktopManager(new DefaultDesktopManager());
-        add(model.map.view);
-        moveToBack(model.map.view);
-        for (Ghost gh: model.ghosts) {
-            add(gh.view);
-            gh.view.display();
-            moveToFront(gh.view);
-        }
-        add(model.player.view);
-        model.player.view.display();
-        moveToFront(model.player.view);
-        model.map.view.setLocation(0, 0);
-        setOpaque(false);
-        LifeIcon lico = new LifeIcon(6*model.map.view.FIELD_SIZE, 7*model.map.view.FIELD_SIZE, model.lives, model.map.view.FIELD_SIZE, 8);
-        add(lico);
-        lico.setLocation(6*model.map.view.FIELD_SIZE, 7*model.map.view.FIELD_SIZE);
-        moveToFront(lico);
-        m.addObserver(lico);
-        ScoreField sf = new ScoreField(model, 6, 1);
-        add(sf);
-        moveToFront(sf);
-        m.addObserver(sf);
-        this.addKeyListener(new KeyAction(g));
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return model.map.view.getPreferredSize();
-    }
-
-    @Override
-    public Dimension getMaximumSize() {
-        return getPreferredSize();
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        model.map.view.setLocation(0, 0);
-        super.paintComponent(g);
-    }
-}
 
 class GameController {
     private GameModel model;
@@ -115,17 +65,69 @@ class GameController {
     public void pause() {
         model.setPaused(!model.isPaused());
     }
-}
-
-public class Game {
-    public GameModel model;
-    public GameSimpleView view;
-    public GameController controller;
-
-    public Game() {
-        model = new GameModel();
-        controller = new GameController(model);
-        view = new GameSimpleView(this);
+    public void eat() {
+        model.map
     }
 }
 
+public class Game implements Runnable {
+    public GameModel model;
+    public GameSimpleView view;
+    public GameController controller;
+    private long timeformove, timeforresp, timeforeat;
+
+    public Game(long timeformove, long timeforeat, long timeforresp) {
+        model = new GameModel(timeformove, timeforeat, timeforresp);
+        controller = new GameController(model);
+        view = new GameSimpleView(this);
+        this.timeforeat = timeforeat;
+        this.timeformove = timeformove;
+        this.timeforresp = timeforresp;
+    }
+
+    @Override
+    public void run() {
+        Timer chasingtime = new Timer();
+        chasingtime.schedule(new GhostTask(model, State.CHASING),0, timeformove);
+        Timer eatingtime = new Timer();
+        eatingtime.schedule(new GhostTask(model, State.EATABLE),0, (long)(1.3 * timeformove));
+        Timer resptime = new Timer();
+        resptime.schedule(new GhostTask(model, State.RESPAWNING),0, timeformove);
+        Timer pacmantime = new Timer();
+        pacmantime.schedule(new PlayerTask(model), 0, timeformove);
+
+    }
+}
+
+class GhostTask extends TimerTask{
+    private GameModel gm;
+    private State state;
+
+    @Override
+    public void run(){
+        for (Ghost g: gm.ghosts) {
+            if (g.model.getStatus() == state) g.controller.move();
+        }
+    }
+
+    public GhostTask(GameModel g, State s){
+        super();
+        gm = g;
+        state = s;
+    }
+}
+
+class PlayerTask extends TimerTask {
+    private GameModel gm;
+
+    @Override
+    public void run() {
+        gm.player.controller.move();
+
+    }
+
+    public PlayerTask(GameModel g) {
+        super();
+        gm = g;
+    }
+}

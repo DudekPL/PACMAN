@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
-            Game g = new Game();
+            Game g = new Game(800, 5000, 2500);
             JFrame fr = new JFrame();
             fr.add(g.view);
             fr.pack();
@@ -15,7 +15,7 @@ public class Main {
             fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             fr.setTitle("PAC-MAN");
             fr.addKeyListener(new KeyAction(g));
-            g.model.ghosts.get(0).model.changePos(Direction.UP);
+            g.model.ghosts.get(0).model.changePos(Direction.RIGHT);
             Timer t = new Timer(20, event -> {
                 g.view.repaint();
                 g.model.addPoints(1);
