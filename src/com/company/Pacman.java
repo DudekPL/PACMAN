@@ -19,8 +19,8 @@ class PacmanModel extends GhostModel {
 
 
 class PacmanController extends GhostController {
-    public PacmanController(PacmanModel pm, Map m, int rx, int ry) {
-        super(pm, m, rx, ry);
+    public PacmanController(PacmanModel pm, PacmanSimpleView v, Map m, int rx, int ry) {
+        super(pm, v, m, rx, ry);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class Pacman{
     public Pacman(Map m, int x, int y, int size, long tfm) {
         model = new PacmanModel(x, y);
         view = new PacmanSimpleView(model, size, tfm);
-        controller = new PacmanController(model, m, x, y);
+        controller = new PacmanController(model, view, m, x, y);
         model.addObserver(view);
     }
 }

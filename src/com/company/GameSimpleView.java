@@ -32,7 +32,7 @@ public class GameSimpleView extends JDesktopPane {
         add(sf);
         moveToFront(sf);
         m.addObserver(sf);
-        this.addKeyListener(new KeyAction(g));
+        this.addKeyListener(new KeyActionGame(g));
     }
 
     @Override

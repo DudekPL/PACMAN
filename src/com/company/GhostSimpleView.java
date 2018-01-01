@@ -18,17 +18,13 @@ public class GhostSimpleView extends JComponent implements Observer {
     private String path;
     private long timeofeating;
 
-    public GhostSimpleView(GhostModel m, Color c, int sz, long tfm) {
-        model = m;
-        fieldsize = sz;
-        prevposx = m.getPosx();
-        prevposy = m.getPosy();
-        timeformove = tfm;
-        timeofchange = System.currentTimeMillis();
-        actposx = prevposx;
-        actposy = prevposy;
-        path = getPath(c);
-        direction = Direction.UP;
+
+    public int getActposx() {
+        return actposx;
+    }
+
+    public int getActposy() {
+        return actposy;
     }
 
     static private String getPath(Color c) {
@@ -40,13 +36,28 @@ public class GhostSimpleView extends JComponent implements Observer {
     }
 
     protected void display() {
-        setLocation(actposx, actposy);
         float time = System.currentTimeMillis() - timeofchange;
-        if (time > timeformove) time = timeformove;
-        float posx = (float) fieldsize * (float) (model.getPosx() - prevposx) * (time / timeformove);
+        float atimeformove = timeformove;
+        if (model.getStatus() == State.EATABLE) atimeformove *=1.7;
+        if (time > atimeformove) time = atimeformove;
+        float posx = (float) fieldsize * (float) (model.getPosx() - prevposx) * (time /atimeformove);
         actposx = (int)posx + prevposx * fieldsize;
-        float posy = (float) fieldsize * (float) (model.getPosy() - prevposy) * (time / timeformove);
+        float posy = (float) fieldsize * (float) (model.getPosy() - prevposy) * (time / atimeformove);
         actposy = (int)posy + prevposy * fieldsize;
+        setLocation(actposx, actposy);
+    }
+
+    public GhostSimpleView(GhostModel m, Color c, int sz, long tfm) {
+        model = m;
+        fieldsize = sz;
+        prevposx = m.getPosx();
+        prevposy = m.getPosy();
+        timeformove = tfm;
+        timeofchange = System.currentTimeMillis();
+        actposx = prevposx;
+        actposy = prevposy;
+        path = getPath(c);
+        direction = Direction.UP;
     }
 
     @Override

@@ -20,6 +20,8 @@ class GhostModel extends Observable {
     protected volatile int posy;
     long timeforeating, timeforrespawning;
     private volatile State status;
+    protected volatile  int actposx;
+    protected volatile int actposy;
 
     public GhostModel(int x, int y, long tfe, long tfr) {
         posx = x;
@@ -32,6 +34,16 @@ class GhostModel extends Observable {
         t.setRepeats(false);
         t.start();
     }
+
+    public int getActposx() {
+        return actposx;
+    }
+
+    public int getActposy() {
+        return actposy;
+    }
+
+    public synchronized void setActPos(int x, int y) {actposx = x; actposy = y;}
 
     public synchronized int getPosx() {
         return posx;
@@ -93,13 +105,19 @@ class GhostController {
     protected Map map;
     protected int respx;
     protected int respy;
+    protected GhostSimpleView view;
 
-    public GhostController(GhostModel gm, Map m, int rx, int ry) {
+    public GhostController(GhostModel gm, GhostSimpleView v, Map m, int rx, int ry) {
         model = gm;
         map = m;
         respx = rx;
         respy = ry;
-    } //TODO nextMoves
+        view = v;
+    }
+
+    public void setActPos(){
+        model.setActPos(view.getActposx(), view.getActposy());
+    }
 
     public Direction nextMoveChasing(int x, int y) {
         int posx,posy;
@@ -107,6 +125,7 @@ class GhostController {
         posy = model.posy;
         return BFS(posx, posy, 12, x, y);
     }
+
     class Vertex{
         Dimension coords;
         int depth;
@@ -134,10 +153,18 @@ class GhostController {
             v = q.poll();
             if (v.coords.width == pacx && v.coords.height == pacy) break;
             if (v.depth<maxdepth) {
-                if (map.model.field(v.coords.width, v.coords.height).model.canDown()) q.offer(new Vertex(v.coords.width, v.coords.height+1,v.depth+1, v));
-                if (map.model.field(v.coords.width, v.coords.height).model.canUp()) q.offer(new Vertex(v.coords.width, v.coords.height-1,v.depth+1, v));
-                if (map.model.field(v.coords.width, v.coords.height).model.canLeft()) q.offer(new Vertex(v.coords.width-1, v.coords.height,v.depth+1, v));
-                if (map.model.field(v.coords.width, v.coords.height).model.canRight()) q.offer(new Vertex(v.coords.width+1, v.coords.height,v.depth+1, v));
+                if (map.model.field(v.coords.width, v.coords.height).model.canDown())
+                    if (v.parent == null || (v.coords.width != v.parent.coords.width || v.coords.height+1 != v.parent.coords.height))
+                        q.offer(new Vertex(v.coords.width, v.coords.height+1,v.depth+1, v));
+                if (map.model.field(v.coords.width, v.coords.height).model.canUp())
+                    if (v.parent == null || (v.coords.width != v.parent.coords.width || v.coords.height-1 != v.parent.coords.height))
+                        q.offer(new Vertex(v.coords.width, v.coords.height-1,v.depth+1, v));
+                if (map.model.field(v.coords.width, v.coords.height).model.canLeft())
+                    if (v.parent == null || (v.coords.width-1 != v.parent.coords.width || v.coords.height != v.parent.coords.height))
+                        q.offer(new Vertex(v.coords.width-1, v.coords.height,v.depth+1, v));
+                if (map.model.field(v.coords.width, v.coords.height).model.canRight())
+                    if (v.parent == null || (v.coords.width+1 != v.parent.coords.width || v.coords.height != v.parent.coords.height))
+                        q.offer(new Vertex(v.coords.width+1, v.coords.height,v.depth+1, v));
             }
         }
         while(v != null && v.parent !=null && (v.parent.coords.width != firstx || v.parent.coords.height != firsty)) {
@@ -153,15 +180,26 @@ class GhostController {
     }
 
     public Direction nextMoveEatable(int x, int y) {
+        int posx, posy;
         synchronized (model) {
-            return Direction.NONE;
+            posx = model.posx;
+            posy = model.posy;
         }
+        Direction d = BFS(posx, posy, 4, x, y);
+        if (map.model.field(posx,posy).model.canUp() && d!=Direction.UP) return Direction.UP;
+        if (map.model.field(posx,posy).model.canRight() && d!=Direction.RIGHT) return Direction.RIGHT;
+        if (map.model.field(posx,posy).model.canLeft() && d!=Direction.LEFT) return Direction.LEFT;
+        if (map.model.field(posx,posy).model.canDown() && d!=Direction.DOWN) return Direction.DOWN;
+        return Direction.NONE;
     }
 
     public Direction nextMoveRespawning() {
+        int posx, posy;
         synchronized (model) {
-            return Direction.NONE;
+            posx = model.posx;
+            posy = model.posy;
         }
+        return BFS(posx, posy, 4, 8, 2);
     }
 
     public void move(int x, int y) {
@@ -196,7 +234,7 @@ public class Ghost {
     public Ghost(Map m, int x, int y, Color c, int size, long tfm, long tfe, long tfr) {
         model = new GhostModel(x, y, tfe, tfr);
         view = new GhostSimpleView(model, c, size, tfm);
-        controller = new GhostController(model, m, x, y);
+        controller = new GhostController(model, view, m, x, y);
         model.addObserver(view);
     }
 }

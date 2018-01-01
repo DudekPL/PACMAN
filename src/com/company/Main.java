@@ -9,39 +9,31 @@ public class Main {
         //TODO dodac guzik nowa gra i wycisz na planszy
         EventQueue.invokeLater(() -> {
             Game g = new Game(800, 5000, 5000);
+            Menu m = new Menu();
             JFrame fr = new JFrame();
-            fr.add(g.view);
+            fr.add(m);
             fr.pack();
             fr.setVisible(true);
             fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             fr.setTitle("PAC-MAN");
-            fr.addKeyListener(new KeyAction(g));
+            KeyActionGame keygame = new KeyActionGame(g);
+            KeyActionMenu keymenu = new KeyActionMenu(g, fr, keygame, m);
+            fr.addKeyListener(keymenu);
+            EndFlag.init();
             Timer t = new Timer(20, event -> {
-                g.view.repaint();
+                if (EndFlag.isEnded() && !EndFlag.ended) {
+                    System.out.println("d");
+                    EndFlag.ended = true;
+                    fr.remove(g.view);
+                    fr.removeKeyListener(keygame);
+                    fr.add(m);
+                    fr.addKeyListener(keymenu);
+                    fr.revalidate();
+                    fr.repaint();
+                }
+                fr.repaint();
             });
             t.start();
-            g.run();
-        });
-    }
-
-    public void demo() {
-        EventQueue.invokeLater(() -> {
-            Game g = new Game(800, 5000, 2500);
-            JFrame fr = new JFrame();
-            fr.add(g.view);
-            fr.pack();
-            fr.setVisible(true);
-            fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            fr.setTitle("PAC-MAN");
-            fr.addKeyListener(new KeyAction(g));
-            g.model.ghosts.get(0).model.changePos(Direction.RIGHT);
-            Timer t = new Timer(20, event -> {
-                g.view.repaint();
-                g.model.addPoints(1);
-            });
-            Timer t2 = new Timer(800, event -> g.model.player.controller.move());
-            t.start();
-            t2.start();
         });
     }
 }
