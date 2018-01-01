@@ -1,6 +1,8 @@
 package com.company;
 
 import java.awt.*;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Observable;
 import javax.swing.*;
 
@@ -14,10 +16,10 @@ enum Direction {
 
 
 class GhostModel extends Observable {
-    protected int posx;
-    protected int posy;
+    protected volatile int posx;
+    protected volatile int posy;
     long timeforeating, timeforrespawning;
-    private State status;
+    private volatile State status;
 
     public GhostModel(int x, int y, long tfe, long tfr) {
         posx = x;
@@ -31,15 +33,15 @@ class GhostModel extends Observable {
         t.start();
     }
 
-    public int getPosx() {
+    public synchronized int getPosx() {
         return posx;
     }
 
-    public int getPosy() {
+    public synchronized int getPosy() {
         return posy;
     }
 
-    public void changePos(Direction d) {
+    public synchronized void changePos(Direction d) {
         switch (d) {
             case UP:
                 posy = posy - 1;
@@ -58,7 +60,7 @@ class GhostModel extends Observable {
         notifyObservers(d);
     }
 
-    public void respawn(int x, int y) {
+    public synchronized void respawn(int x, int y) {
         posx = x;
         posy = y;
         status = State.RESPAWNING;
@@ -70,7 +72,7 @@ class GhostModel extends Observable {
         notifyObservers(Direction.NONE);
     }
 
-    public State getStatus() {
+    public synchronized State getStatus() {
         return status;
     }
 
@@ -99,24 +101,77 @@ class GhostController {
         respy = ry;
     } //TODO nextMoves
 
-    public Direction nextMoveChasing() {
+    public Direction nextMoveChasing(int x, int y) {
+        int posx,posy;
+        posx = model.posx;
+        posy = model.posy;
+        return BFS(posx, posy, 12, x, y);
+    }
+    class Vertex{
+        Dimension coords;
+        int depth;
+        Vertex parent;
+
+        Vertex(int x, int y, int d, Vertex p) {
+            coords = new Dimension(x, y);
+            depth = d;
+            parent = p;
+        }
+
+        Vertex(int x, int y) {
+            depth = 0;
+            coords = new Dimension(x,y);
+            parent = null;
+        }
+    }
+
+
+    private Direction BFS(int firstx, int firsty, int maxdepth, int pacx, int pacy) {
+        Queue<Vertex> q = new LinkedList<>();
+        Vertex v = new Vertex(firstx, firsty);
+        q.offer(v);
+        while(!q.isEmpty()) {
+            v = q.poll();
+            if (v.coords.width == pacx && v.coords.height == pacy) break;
+            if (v.depth<maxdepth) {
+                if (map.model.field(v.coords.width, v.coords.height).model.canDown()) q.offer(new Vertex(v.coords.width, v.coords.height+1,v.depth+1, v));
+                if (map.model.field(v.coords.width, v.coords.height).model.canUp()) q.offer(new Vertex(v.coords.width, v.coords.height-1,v.depth+1, v));
+                if (map.model.field(v.coords.width, v.coords.height).model.canLeft()) q.offer(new Vertex(v.coords.width-1, v.coords.height,v.depth+1, v));
+                if (map.model.field(v.coords.width, v.coords.height).model.canRight()) q.offer(new Vertex(v.coords.width+1, v.coords.height,v.depth+1, v));
+            }
+        }
+        while(v != null && v.parent !=null && (v.parent.coords.width != firstx || v.parent.coords.height != firsty)) {
+            if (v == null) break;
+            v = v.parent;
+        }
+        if (v == null) return Direction.NONE;
+        if (v.coords.height - firsty == 1) return Direction.DOWN;
+        if (v.coords.height - firsty == -1) return Direction.UP;
+        if (v.coords.width - firstx == 1) return Direction.RIGHT;
+        if (v.coords.width - firstx == -1) return Direction.LEFT;
         return Direction.NONE;
     }
 
-    public Direction nextMoveEatable() {
-        return Direction.NONE;
+    public Direction nextMoveEatable(int x, int y) {
+        synchronized (model) {
+            return Direction.NONE;
+        }
     }
 
     public Direction nextMoveRespawning() {
-        return Direction.NONE;
+        synchronized (model) {
+            return Direction.NONE;
+        }
     }
 
-    public void move() {
+    public void move(int x, int y) {
         Direction d = Direction.NONE;
-        if (model.getStatus() == State.CHASING) d = nextMoveChasing();
-        if (model.getStatus() == State.EATABLE) d = nextMoveEatable();
-        if (model.getStatus() == State.RESPAWNING) d = nextMoveRespawning();
-        model.changePos(d);
+        synchronized (model) {
+            if (model.getStatus() == State.CHASING) d = nextMoveChasing(x, y);
+            if (model.getStatus() == State.EATABLE) d = nextMoveEatable(x, y);
+            if (model.getStatus() == State.RESPAWNING) d = nextMoveRespawning();
+            model.changePos(d);
+        }
     }
 
     public void makeEatable() {

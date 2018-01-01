@@ -24,13 +24,12 @@ class GameModel extends Observable{
         ghosts = new ArrayList<>();
         ghosts.add(new Ghost(map, 7, 4, Color.RED, map.view.FIELD_SIZE, timeformove, timeforeat, timeforresp));
         player = new Pacman(map, 8, 6, map.view.FIELD_SIZE, timeformove);
-        map.model.field(8, 6).model.setInside(Inside.EMPTY);
         this.timeforeat = timeforeat;
         this.timeformove = timeformove;
         this.timeforresp = timeforresp;
     }
 
-    public int getLives() {return lives;}
+    public synchronized int getLives() {return lives;}
 
     public void lostLive() {
         lives = lives - 1;
@@ -57,7 +56,7 @@ class GameModel extends Observable{
 
     public int getScore() { return score; }
 
-    public void addPoints(int n){
+    public synchronized void addPoints(int n){
         score = score + n;
         if (score>=1000000) score = 999999;
         setChanged();
@@ -72,7 +71,9 @@ class GameModel extends Observable{
         this.paused = paused;
     }
 
-    public void endGame() {}
+    public synchronized void endGame() {
+        EndFlag.ending = true;
+    }
 }
 
 
@@ -85,7 +86,7 @@ class GameController {
     public void pause() {
         model.setPaused(!model.isPaused());
     }
-    public void eat() {
+    public synchronized void eat() {
         Inside i = model.map.controller.eat(model.player.model.getPosx(), model.player.model.getPosy(), (int)model.timeformove);
         switch (i) {
             case DOT: model.addPoints(10);
@@ -121,13 +122,18 @@ class GameController {
             t.start();
         }
     }
+    public synchronized void collide(int i, State s){
+        if (s == State.CHASING) model.lostLive();
+        if (s == State.EATABLE) model.addPoints(100);
+        model.ghosts.get(i).controller.collided();
+        model.player.controller.collided();
+    }
 }
 
 public class Game implements Runnable {
     public GameModel model;
     public GameSimpleView view;
     public GameController controller;
-    private boolean ended = false;
     private long timeformove, timeforresp, timeforeat;
 
     public Game(long timeformove, long timeforeat, long timeforresp) {
@@ -137,10 +143,13 @@ public class Game implements Runnable {
         this.timeforeat = timeforeat;
         this.timeformove = timeformove;
         this.timeforresp = timeforresp;
+        for (int i = 0; i <model.map.model.getSizex() ; i++)
+            for (int j = 0; j < model.map.model.getSizey(); j++) model.map.model.field(i,j).view.Timeformove((int)timeformove);
     }
 
     @Override
     public void run() {
+        EndFlag.start();
         Timer chasingtime = new Timer();
         chasingtime.schedule(new GhostTask(this, State.CHASING),0, timeformove);
         Timer eatingtime = new Timer();
@@ -148,13 +157,46 @@ public class Game implements Runnable {
         Timer resptime = new Timer();
         resptime.schedule(new GhostTask(this, State.RESPAWNING),0, timeformove);
         Timer pacmantime = new Timer();
-        pacmantime.schedule(new PlayerTask(this), 0, timeformove);
+        pacmantime.schedule(new PlayerTask(this, (int)timeformove), 0, timeformove);
+    }
+}
+
+class EndFlag {
+    public static boolean chasing ;
+    public static boolean ending;
+    public static boolean eating;
+    public static boolean resping;
+    public static boolean pacman;
+    public static boolean ended;
+
+    public static void start() {
+        chasing = false;
+        ending = false;
+        eating = false;
+        resping = false;
+        pacman = false;
+        ended = false;
+    }
+
+    public static boolean isEnded(){
+        return (chasing && ending && eating && resping && pacman);
+    }
+
+    public static int numb() {
+        int i = 0;
+        if (chasing) i+=i;
+        if (ending) i+=i;
+        if (eating) i+=i;
+        if (resping) i+=i;
+        if (pacman) i+=i;
+        return i;
     }
 }
 
 class GhostTask extends TimerTask{
     private Game gm;
     private State state;
+    private int i;
 
     public GhostTask(Game g, State s){
         super();
@@ -165,18 +207,47 @@ class GhostTask extends TimerTask{
     @Override
     public void run(){
         if (!gm.model.isPaused())
+            i = 0;
             for (Ghost g: gm.model.ghosts) {
-                if (g.model.getStatus() == state) g.controller.move();
+                synchronized (g.model) {
+                    if (g.model.getStatus() == state) {
+                        if (g.model.getPosx() == gm.model.player.model.getPosx() && g.model.getPosy() == gm.model.player.model.getPosy()) {
+                            System.out.println(i);
+                            gm.controller.collide(i, g.model.getStatus());
+                        }
+                        else g.controller.move(gm.model.player.model.getPosx(), gm.model.player.model.getPosy());
+                        if (g.model.getPosx() == gm.model.player.model.getPosx() && g.model.getPosy() == gm.model.player.model.getPosy()) {
+                            gm.controller.collide(i, g.model.getStatus());
+                        }
+                    }
+                    i +=1;
+                }
             }
+        if (EndFlag.ending){
+            switch (state) {
+                case RESPAWNING:
+                    EndFlag.resping = true;
+                    break;
+                case EATABLE:
+                    EndFlag.eating = true;
+                    break;
+                case CHASING:
+                    EndFlag.chasing = true;
+                    break;
+            }
+            cancel();
+        }
     }
 }
 
 class PlayerTask extends TimerTask {
     private Game gm;
+    private int delay;
 
-    public PlayerTask(Game g) {
+    public PlayerTask(Game g, int delay) {
         super();
         gm = g;
+        this.delay = delay;
     }
 
     @Override
@@ -185,12 +256,21 @@ class PlayerTask extends TimerTask {
             gm.model.player.controller.move();
             gm.controller.eat();
             if (gm.model.map.model.isEmpty()) {
-                gm.model.map.model.init();
-                for (Ghost g : gm.model.ghosts) {
-                    g.controller.respawn();
-                }
-                gm.model.player.controller.respawn();
+                javax.swing.Timer t = new javax.swing.Timer(0, event->{
+                    gm.model.map.model.init();
+                    for (Ghost g : gm.model.ghosts) {
+                        g.controller.respawn();
+                    }
+                    gm.model.player.controller.respawn();
+                });
+                t.setInitialDelay(delay);
+                t.setRepeats(false);
+                t.start();
             }
+        }
+        if (EndFlag.ending){
+            EndFlag.pacman = true;
+            cancel();
         }
     }
 }

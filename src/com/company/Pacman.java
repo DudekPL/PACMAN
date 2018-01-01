@@ -1,10 +1,5 @@
 package com.company;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Observable;
-import java.util.Observer;
-
 class PacmanModel extends GhostModel {
     private Direction nextmove;
 
@@ -17,7 +12,7 @@ class PacmanModel extends GhostModel {
         return nextmove;
     }
 
-    public void setNextmove(Direction nextmove) {
+    public synchronized void setNextmove(Direction nextmove) {
         this.nextmove = nextmove;
     }
 }
@@ -30,19 +25,22 @@ class PacmanController extends GhostController {
 
     @Override
     public void respawn() {
-        ((PacmanModel)model).setNextmove(Direction.NONE);
-        super.respawn();
+        synchronized (model) {
+            ((PacmanModel)model).setNextmove(Direction.NONE);
+            super.respawn();
+        }
     }
 
-    @Override
     public void move() {
-        Direction d = ((PacmanModel)model).getNextmove();
-        int x = model.getPosx();
-        int y = model.getPosy();
-        if (d == Direction.RIGHT && map.model.field(x,y).model.canRight()) {model.changePos(d); return;}
-        if (d == Direction.LEFT && map.model.field(x,y).model.canLeft()) {model.changePos(d); return;}
-        if (d == Direction.DOWN && map.model.field(x,y).model.canDown()) {model.changePos(d); return;}
-        if (d == Direction.UP && map.model.field(x,y).model.canUp()) {model.changePos(d); return;}
+        synchronized (model) {
+            Direction d = ((PacmanModel)model).getNextmove();
+            int x = model.getPosx();
+            int y = model.getPosy();
+            if (d == Direction.RIGHT && map.model.field(x,y).model.canRight()) {model.changePos(d); return;}
+            if (d == Direction.LEFT && map.model.field(x,y).model.canLeft()) {model.changePos(d); return;}
+            if (d == Direction.DOWN && map.model.field(x,y).model.canDown()) {model.changePos(d); return;}
+            if (d == Direction.UP && map.model.field(x,y).model.canUp()) {model.changePos(d); return;}
+        }
     }
 
     public void setnextMove(Direction d){

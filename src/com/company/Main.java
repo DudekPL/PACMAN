@@ -5,7 +5,8 @@ import java.awt.*;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) { //TODO zeby animacja ruchu sie koczyla przy smierci i menu glowne z zapisem leaderboard
+        //TODO dodac guzik nowa gra i wycisz na planszy
         EventQueue.invokeLater(() -> {
             Game g = new Game(800, 5000, 5000);
             JFrame fr = new JFrame();

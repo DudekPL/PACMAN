@@ -19,6 +19,7 @@ class MapModel {
 
     public void init(){
         for (int i = 0; i < 18; i++) for (int j = 0; j < 9; j++) fields[i][j].model.setInside(Inside.DOT);
+        fields[8][6].model.setInside(Inside.EMPTY);
         for (Field f : fields[0]) f.model.setLeft(false);
         for (Field f : fields[17]) f.model.setRight(false);
         for (int i = 0; i < 18; i++) {
@@ -161,7 +162,7 @@ class MapController {
     private MapModel model;
 
     public MapController(MapModel m) {model = m;}
-    public Inside eat(int x, int y, int delay) {return model.field(x, y).controller.eat(delay);}
+    public Inside eat(int x, int y, int delay) {return model.field(x, y).controller.eat();}
 }
 
 class MapSimpleView extends JLayeredPane {

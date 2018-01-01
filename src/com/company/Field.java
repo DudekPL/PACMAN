@@ -4,12 +4,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Observable;
+import java.util.Observer;
 
 enum Inside {
     EMPTY, DOT, BIGDOT, FRUIT
 }
 
-class FieldModel {
+class FieldModel extends Observable{
     private Inside inside;
     private boolean up;
     private boolean down;
@@ -32,12 +34,14 @@ class FieldModel {
         left = true;
     }
 
-    public Inside getInside() {
+    public synchronized Inside getInside() {
         return inside;
     }
 
-    public void setInside(Inside i) {
+    public synchronized void setInside(Inside i) {
         inside = i;
+        setChanged();
+        notifyObservers();
     }
 
     public boolean canUp() {
@@ -82,23 +86,37 @@ class FieldController {
     private FieldModel model;
 
     public FieldController(FieldModel m) {model = m;}
-    public Inside eat(int delay) {
+    public Inside eat() {
         Inside pom = model.getInside();
-        Timer t = new Timer(0, event->model.setInside(Inside.EMPTY));
-        t.setInitialDelay(delay);
-        t.setRepeats(false);
-        t.start();
+        model.setInside(Inside.EMPTY);
         return pom;
     }
 }
 
-class FieldSimpleView extends JComponent {
+class FieldSimpleView extends JComponent implements Observer {
     public static final int FIELD_SIZE = 40;
     private static final int WALL_WIDTH = 5;
     private FieldModel model;
+    private Inside inside;
+    private int timeformove = 800;
+
+    public void Timeformove(int tom) {timeformove = tom;}
 
     public FieldSimpleView(FieldModel m) {
         model = m;
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        Inside in = ((FieldModel)o).getInside();
+        if (in == Inside.DOT || in == Inside.BIGDOT)
+        inside = in;
+        else{
+            Timer t = new Timer(0, event->inside = in);
+            t.setInitialDelay(timeformove);
+            t.setRepeats(false);
+            t.start();
+        }
     }
 
     @Override
@@ -117,11 +135,11 @@ class FieldSimpleView extends JComponent {
         if (!model.canRight())
             g2.fill(new Rectangle2D.Float(FIELD_SIZE - WALL_WIDTH, 0, WALL_WIDTH, FIELD_SIZE));
         g2.setPaint(Color.WHITE);
-        if (model.getInside() == Inside.DOT)
+        if (inside == Inside.DOT || (inside == Inside.EMPTY && model.getInside() == Inside.DOT))
             g2.fill(new Ellipse2D.Float((float)0.5*FIELD_SIZE - r, (float)0.5 * FIELD_SIZE - r, 2 * r, 2 * r));
-        if (model.getInside() == Inside.BIGDOT)
+        if (inside == Inside.BIGDOT || (inside == Inside.EMPTY && model.getInside() == Inside.BIGDOT))
             g2.fill(new Ellipse2D.Float((float) 0.5 * FIELD_SIZE - 2 * r, (float) 0.5 * FIELD_SIZE - 2 * r, 4 * r, 4 * r));
-        if (model.getInside() == Inside.FRUIT) {
+        if (inside == Inside.FRUIT || (inside == Inside.EMPTY && model.getInside() == Inside.FRUIT)) {
             ImageIcon img = new ImageIcon("img/Icons/Cherry.png");
             g2.scale(FIELD_SIZE/((float)img.getIconWidth()), FIELD_SIZE/((float)img.getIconHeight()));
             g2.drawImage(img.getImage(), 0, 0, null);
@@ -143,5 +161,6 @@ public class Field {
         model = new FieldModel();
         view = new FieldSimpleView(model);
         controller = new FieldController(model);
+        model.addObserver(view);
     }
 }

@@ -23,7 +23,11 @@ public class ScoreField extends JComponent implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        score = ((GameModel) o).getScore();
+        int s = ((GameModel) o).getScore();
+        Timer t = new Timer(0, event->score = s);
+        t.setInitialDelay((int)((GameModel) o).timeformove);
+        t.setRepeats(false);
+        t.start();
     }
 
     @Override
