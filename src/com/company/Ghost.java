@@ -22,8 +22,9 @@ class GhostModel extends Observable {
     private volatile State status;
     protected volatile  int actposx;
     protected volatile int actposy;
+    private final Color color;
 
-    public GhostModel(int x, int y, long tfe, long tfr) {
+    public GhostModel(int x, int y, long tfe, long tfr, Color c) {
         posx = x;
         posy = y;
         status = State.RESPAWNING;
@@ -33,6 +34,7 @@ class GhostModel extends Observable {
         t.setInitialDelay((int)timeforrespawning);
         t.setRepeats(false);
         t.start();
+        color = c;
     }
 
     public int getActposx() {
@@ -41,6 +43,10 @@ class GhostModel extends Observable {
 
     public int getActposy() {
         return actposy;
+    }
+
+    public Color getColor() {
+        return color;
     }
 
     public synchronized void setActPos(int x, int y) {actposx = x; actposy = y;}
@@ -194,12 +200,17 @@ class GhostController {
     }
 
     public Direction nextMoveRespawning() {
-        int posx, posy;
+        int posx, posy, x, y;
+        x=y=0;
         synchronized (model) {
             posx = model.posx;
             posy = model.posy;
         }
-        return BFS(posx, posy, 4, 8, 2);
+        Color c = model.getColor();
+        if (c==Color.PINK) {x=17;y=0;}
+        if (c==Color.RED) {x=0; y=8;}
+        if (c==Color.BLUE) {x=17;y=8;}
+        return BFS(posx, posy, 20, x,y);
     }
 
     public void move(int x, int y) {
@@ -232,7 +243,7 @@ public class Ghost {
     public GhostController controller;
 
     public Ghost(Map m, int x, int y, Color c, int size, long tfm, long tfe, long tfr) {
-        model = new GhostModel(x, y, tfe, tfr);
+        model = new GhostModel(x, y, tfe, tfr, c);
         view = new GhostSimpleView(model, c, size, tfm);
         controller = new GhostController(model, view, m, x, y);
         model.addObserver(view);

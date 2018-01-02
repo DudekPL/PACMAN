@@ -1,10 +1,12 @@
 package com.company;
 
+import java.awt.*;
+
 class PacmanModel extends GhostModel {
     private Direction nextmove;
 
     public PacmanModel(int x, int y) {
-        super(x, y, 0, 0);
+        super(x, y, 0, 0, Color.RED);
         nextmove = Direction.NONE;
     }
 

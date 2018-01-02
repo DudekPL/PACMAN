@@ -23,6 +23,8 @@ class GameModel extends Observable{
         map = new Map();
         ghosts = new ArrayList<>();
         ghosts.add(new Ghost(map, 7, 4, Color.RED, map.view.FIELD_SIZE, timeformove, timeforeat, timeforresp));
+        ghosts.add(new Ghost(map, 9, 4, Color.YELLOW, map.view.FIELD_SIZE, timeformove, timeforeat, timeforresp));
+        ghosts.add(new Ghost(map, 9, 4, Color.BLUE, map.view.FIELD_SIZE, timeformove, timeforeat, timeforresp));
         player = new Pacman(map, 8, 6, map.view.FIELD_SIZE, timeformove);
         this.timeforeat = timeforeat;
         this.timeformove = timeformove;
@@ -45,6 +47,9 @@ class GameModel extends Observable{
             e.printStackTrace();
         } catch (LineUnavailableException e) {
             e.printStackTrace();
+        }
+        for (Ghost g:ghosts) {
+            g.controller.respawn();
         }
         if (lives < 1) {
             endGame();
@@ -173,7 +178,7 @@ public class Game implements Runnable {
     public void run() {
         EndFlag.start();
         Timer chasingtime = new Timer();
-        chasingtime.schedule(new GhostTask(this, State.CHASING),0, (long)(1.05 * timeformove));
+        chasingtime.schedule(new GhostTask(this, State.CHASING),0, timeformove);
         Timer eatingtime = new Timer();
         eatingtime.schedule(new GhostTask(this, State.EATABLE),0, (long)(1.7 * timeformove));
         Timer resptime = new Timer();
