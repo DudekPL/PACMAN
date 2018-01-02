@@ -8,6 +8,7 @@ public class EndFlag {
     public static boolean pacman;
     public static boolean ended;
     public static boolean updating;
+    public static boolean saving;
 
     public static void start() {
         chasing = false;
@@ -17,10 +18,11 @@ public class EndFlag {
         pacman = false;
         ended = false;
         updating = false;
+        saving = false;
     }
 
     public static boolean isEnded(){
-        return (chasing && ending && eating && resping && pacman && updating);
+        return (chasing && ending && eating && resping && pacman && updating && saving);
     }
 
     public static int numb() {
@@ -31,6 +33,7 @@ public class EndFlag {
         if (resping) i+=i;
         if (pacman) i+=i;
         if (updating) i+=1;
+        if (saving) i+=1;
         return i;
     }
 
@@ -42,5 +45,6 @@ public class EndFlag {
         pacman = true;
         ended = true;
         updating = true;
+        saving = true;
     }
 }

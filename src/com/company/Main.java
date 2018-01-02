@@ -31,6 +31,7 @@ public class Main {
                     fr.revalidate();
                     fr.repaint();
                 }
+                if (EndFlag.ending && !EndFlag.saving) SavingScore.save();
                 fr.repaint();
             });
             t.start();

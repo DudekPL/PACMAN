@@ -71,6 +71,7 @@ class GameModel extends Observable{
     }
 
     public synchronized void endGame() {
+        SavingScore.upload(score);
         EndFlag.ending = true;
     }
 }

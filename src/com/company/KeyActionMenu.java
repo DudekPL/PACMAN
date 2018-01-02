@@ -33,9 +33,6 @@ public class KeyActionMenu implements KeyListener {
                 File board = new File("lboard.txt");
                 if (board.createNewFile()) JOptionPane.showMessageDialog(null, "Plik został uszkodzony lub usunięty.\nStworzono nowy.", "Leaderboard", JOptionPane.PLAIN_MESSAGE);
                 boardreader = new Scanner(board);
-                if (boardreader.hasNextInt()){
-                    boardreader.nextLine();
-                }
                 int i = 1;
                 while (boardreader.hasNextLine()) {
                     String name = boardreader.nextLine();
