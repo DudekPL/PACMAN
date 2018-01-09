@@ -33,7 +33,7 @@ public class GameSimpleView extends JDesktopPane implements Observer{
         moveToFront(model.player.view);
         model.map.view.setLocation(0, 0);
         setOpaque(false);
-        LifeIcon lico = new LifeIcon(6*model.map.view.FIELD_SIZE, 7*model.map.view.FIELD_SIZE, model.lives, model.map.view.FIELD_SIZE, 8);
+        LifeIcon lico = new LifeIcon(6*model.map.view.FIELD_SIZE, 7*model.map.view.FIELD_SIZE, model.getLives(), model.map.view.FIELD_SIZE, 8);
         add(lico);
         lico.setLocation(6*model.map.view.FIELD_SIZE, 7*model.map.view.FIELD_SIZE);
         moveToFront(lico);

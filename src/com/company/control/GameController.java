@@ -4,6 +4,7 @@ package com.company.control;
 import com.company.model.GameModel;
 import com.company.util.enums.Inside;
 import com.company.util.enums.State;
+import com.company.wrapper.Ghost;
 
 import javax.sound.sampled.*;
 import java.io.File;

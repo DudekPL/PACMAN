@@ -1,20 +1,24 @@
 package com.company.model;
 
+import com.company.util.EndFlag;
+import com.company.util.SavingScore;
 import com.company.wrapper.Ghost;
 import com.company.wrapper.Map;
 import com.company.wrapper.Pacman;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
 import java.util.Observable;
+
 
 public class GameModel extends Observable {
     int score;
     int lives;
-    Map map;
+    public Map map;
     public Pacman player;
-    List<Ghost> ghosts;
-    long timeforeat,timeformove,timeforresp;
+    public List<Ghost> ghosts;
+    public final long timeforeat,timeformove,timeforresp;
     private boolean paused;
 
     public GameModel(long timeformove, long  timeforeat, long timeforresp) {

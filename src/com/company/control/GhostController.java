@@ -93,8 +93,8 @@ public class GhostController {
     public Direction nextMoveEatable(int x, int y) {
         int posx, posy;
         synchronized (model) {
-            posx = model.posx;
-            posy = model.posy;
+            posx = model.getPosx();
+            posy = model.getPosy();
         }
         Direction d = BFS(posx, posy, 4, x, y);
         if (map.model.field(posx,posy).model.canUp() && d!=Direction.UP) return Direction.UP;
@@ -108,8 +108,8 @@ public class GhostController {
         int posx, posy, x, y;
         x=y=0;
         synchronized (model) {
-            posx = model.posx;
-            posy = model.posy;
+            posx = model.getPosx();
+            posy = model.getPosy();
         }
         Color c = model.getColor();
         if (c==Color.PINK) {x=17;y=0;}

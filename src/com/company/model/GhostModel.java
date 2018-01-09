@@ -10,7 +10,7 @@ import java.util.Observable;
 public class GhostModel extends Observable {
     protected volatile int posx;
     protected volatile int posy;
-    long timeforeating, timeforrespawning;
+    public final long timeforeating, timeforrespawning;
     private volatile State status;
     protected volatile  int actposx;
     protected volatile int actposy;
