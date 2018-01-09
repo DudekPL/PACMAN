@@ -1,9 +1,14 @@
 package com.company;
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
 
-public class GameSimpleView extends JDesktopPane {
+public class GameSimpleView extends JDesktopPane implements Observer{
     private GameModel model;
 
     public GameSimpleView(Game g) {
@@ -49,5 +54,24 @@ public class GameSimpleView extends JDesktopPane {
     protected void paintComponent(Graphics g) {
         model.map.view.setLocation(0, 0);
         super.paintComponent(g);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if ((Boolean) arg ){
+            try {
+                File soundFile = new File("wav/pacman_death.wav");
+                AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioIn);
+                clip.start();
+            } catch (UnsupportedAudioFileException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (LineUnavailableException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
