@@ -7,10 +7,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.Observable;
 import java.util.Observer;
 
-enum Inside {
-    EMPTY, DOT, BIGDOT, FRUIT
-}
-
 class FieldModel extends Observable{
     private Inside inside;
     private boolean up;

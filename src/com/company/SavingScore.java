@@ -96,6 +96,8 @@ public class SavingScore {
         catch (SecurityException exc){
             JOptionPane.showMessageDialog(null, "Plik tabeli wyników jest chroniony.\nNie można zapisać twojego wyniku", "Leaderboard", JOptionPane.ERROR_MESSAGE);
         }
+        catch (NullPointerException exc) {
+        }
         finally {
             if (boardreader != null) boardreader.close();
             if (boardwriter != null) boardwriter.close();
