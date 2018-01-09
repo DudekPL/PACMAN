@@ -21,7 +21,6 @@ public class GhostTask extends TimerTask {
 
     @Override
     public void run(){
-        if (!gm.model.isPaused())
             i = 0;
         for (Ghost g: gm.model.ghosts) {
             synchronized (g.model) {

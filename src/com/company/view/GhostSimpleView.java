@@ -4,8 +4,11 @@ import com.company.model.GhostModel;
 import com.company.util.enums.Direction;
 import com.company.util.enums.State;
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -105,6 +108,24 @@ public class GhostSimpleView extends JComponent implements Observer {
     @Override
     public void update(Observable obs, Object obj) {
         if (obs == model) {
+            if (obj instanceof Boolean) {
+                if ((Boolean)obj){
+                    try {
+                        File soundFile = new File("wav/pacman_eatghost.wav");
+                        AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+                        Clip clip = AudioSystem.getClip();
+                        clip.open(audioIn);
+                        clip.start();
+                    } catch (UnsupportedAudioFileException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (LineUnavailableException e) {
+                        e.printStackTrace();
+                    }
+                    return;
+                }
+            }
             timeofchange = System.currentTimeMillis();
             if(((GhostModel)obs).getStatus() != State.EATABLE)  timeofeating = 0;
             else if (timeofeating == 0) timeofeating = System.currentTimeMillis();

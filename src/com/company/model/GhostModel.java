@@ -70,6 +70,12 @@ public class GhostModel extends Observable {
         notifyObservers(d);
     }
 
+    public synchronized void eaten(int x, int y) {
+        setChanged();
+        notifyObservers(Boolean.TRUE);
+        respawn(x, y);
+    }
+
     public synchronized void respawn(int x, int y) {
         posx = x;
         posy = y;

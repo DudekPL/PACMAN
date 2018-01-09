@@ -19,7 +19,7 @@ public class MapModel {
 
     public void init(){
         for (int i = 0; i < 18; i++) for (int j = 0; j < 9; j++) fields[i][j].model.setInside(Inside.DOT);
-        fields[8][6].model.setInside(Inside.EMPTY);
+        fields[8][6].model.initInside(Inside.EMPTY);
         for (Field f : fields[0]) f.model.setLeft(false);
         for (Field f : fields[17]) f.model.setRight(false);
         for (int i = 0; i < 18; i++) {
@@ -71,8 +71,8 @@ public class MapModel {
     }
 
     private void rectHorS(int x, int y) {
-        fields[x][y].model.setInside(Inside.EMPTY);
-        fields[x + 1][y].model.setInside(Inside.EMPTY);
+        fields[x][y].model.initInside(Inside.EMPTY);
+        fields[x + 1][y].model.initInside(Inside.EMPTY);
         fields[x][y].model.setDown(false);
         fields[x][y].model.setDown(false);
         fields[x][y].model.setUp(false);
@@ -90,7 +90,7 @@ public class MapModel {
 
     private void rectHorB(int x, int y) {
         for (int i = 0; i < 6; i++) {
-            fields[x + i][y].model.setInside(Inside.EMPTY);
+            fields[x + i][y].model.initInside(Inside.EMPTY);
             fields[x + i][y].model.setUp(false);
             fields[x + i][y].model.setDown(false);
             fields[x + i][y - 1].model.setDown(false);
@@ -103,8 +103,8 @@ public class MapModel {
     }
 
     private void rectVertU(int x, int y) {
-        fields[x][y].model.setInside(Inside.EMPTY);
-        fields[x][y + 1].model.setInside(Inside.EMPTY);
+        fields[x][y].model.initInside(Inside.EMPTY);
+        fields[x][y + 1].model.initInside(Inside.EMPTY);
         fields[x][y].model.setLeft(false);
         fields[x][y].model.setRight(false);
         fields[x][y + 1].model.setLeft(false);
@@ -118,8 +118,8 @@ public class MapModel {
     }
 
     private void rectVerD(int x, int y) {
-        fields[x][y].model.setInside(Inside.EMPTY);
-        fields[x][y + 1].model.setInside(Inside.EMPTY);
+        fields[x][y].model.initInside(Inside.EMPTY);
+        fields[x][y + 1].model.initInside(Inside.EMPTY);
         fields[x][y].model.setLeft(false);
         fields[x][y].model.setRight(false);
         fields[x][y].model.setUp(false);
@@ -134,13 +134,13 @@ public class MapModel {
 
     private void respBox(int x, int y) {
         for (int i = 0; i < 6; i++) {
-            fields[x + i][y].model.setInside(Inside.EMPTY);
+            fields[x + i][y].model.initInside(Inside.EMPTY);
             fields[x + i][y].model.setUp(false);
             fields[x + i][y - 1].model.setDown(false);
-            fields[x + i][y + 2].model.setInside(Inside.EMPTY);
+            fields[x + i][y + 2].model.initInside(Inside.EMPTY);
             fields[x + i][y + 2].model.setDown(false);
             fields[x + i][y + 3].model.setUp(false);
-            fields[x + i][y + 1].model.setInside(Inside.EMPTY);
+            fields[x + i][y + 1].model.initInside(Inside.EMPTY);
         }
         for (int i = 0; i < 3; i++) {
             fields[x][y + i].model.setLeft(false);

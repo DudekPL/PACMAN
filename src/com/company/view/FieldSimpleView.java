@@ -3,10 +3,13 @@ package com.company.view;
 import com.company.model.FieldModel;
 import com.company.util.enums.Inside;
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -26,13 +29,32 @@ public class FieldSimpleView extends JComponent implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         Inside in = ((FieldModel)o).getInside();
-        if (in == Inside.DOT || in == Inside.BIGDOT)
+        if (in == Inside.DOT || in == Inside.BIGDOT || (Boolean)arg)
             inside = in;
         else{
-            Timer t = new Timer(0, event->inside = in);
-            t.setInitialDelay(timeformove);
-            t.setRepeats(false);
-            t.start();
+            if (in == Inside.EMPTY) {
+                if (inside != Inside.EMPTY) {
+                    Timer t = new Timer(0, event->{
+                        inside = in;
+                        try {
+                            File soundFile = new File("wav/pacman_eatfruit.wav");
+                            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+                            Clip clip = AudioSystem.getClip();
+                            clip.open(audioIn);
+                            clip.start();
+                        } catch (UnsupportedAudioFileException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (LineUnavailableException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    t.setInitialDelay(timeformove);
+                    t.setRepeats(false);
+                    t.start();
+                }
+            }
         }
     }
 

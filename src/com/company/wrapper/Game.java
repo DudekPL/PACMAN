@@ -28,6 +28,7 @@ public class Game implements Runnable {
         model = new GameModel(timeformove, timeforeat, timeforresp);
         controller = new GameController(model);
         view = new GameSimpleView(this);
+        model.addObserver(view);
         for (int i = 0; i <model.map.model.getSizex() ; i++)
             for (int j = 0; j < model.map.model.getSizey(); j++) model.map.model.field(i,j).view.Timeformove((int)timeformove);
     }

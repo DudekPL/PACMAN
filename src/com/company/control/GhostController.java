@@ -135,7 +135,7 @@ public class GhostController {
     public boolean collided() {
         boolean point = false;
         if (model.getStatus() == State.EATABLE) point = true;
-        model.respawn(respx, respy);
+        model.eaten(respx, respy);
         return point;
     }
 

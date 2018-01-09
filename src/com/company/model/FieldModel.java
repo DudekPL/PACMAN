@@ -34,7 +34,13 @@ public class FieldModel extends Observable {
     public synchronized void setInside(Inside i) {
         inside = i;
         setChanged();
-        notifyObservers();
+        notifyObservers(Boolean.FALSE);
+    }
+
+    public synchronized void initInside(Inside i) {
+        inside = i;
+        setChanged();
+        notifyObservers(Boolean.TRUE);
     }
 
     public boolean canUp() {

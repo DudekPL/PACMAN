@@ -18,21 +18,19 @@ public class PlayerTask extends TimerTask {
 
     @Override
     public void run() {
-        if (!gm.model.isPaused()) {
-            gm.model.player.controller.move();
-            gm.controller.eat();
-            if (gm.model.map.model.isEmpty()) {
-                javax.swing.Timer t = new javax.swing.Timer(0, event->{
-                    gm.model.map.model.init();
-                    for (Ghost g : gm.model.ghosts) {
-                        g.controller.respawn();
-                    }
-                    gm.model.player.controller.respawn();
-                });
-                t.setInitialDelay(delay);
-                t.setRepeats(false);
-                t.start();
-            }
+        gm.model.player.controller.move();
+        gm.controller.eat();
+        if (gm.model.map.model.isEmpty()) {
+            javax.swing.Timer t = new javax.swing.Timer(0, event->{
+                gm.model.map.model.init();
+                for (Ghost g : gm.model.ghosts) {
+                    g.controller.respawn();
+                }
+                gm.model.player.controller.respawn();
+            });
+            t.setInitialDelay(delay);
+            t.setRepeats(false);
+            t.start();
         }
         if (EndFlag.ending){
             EndFlag.pacman = true;

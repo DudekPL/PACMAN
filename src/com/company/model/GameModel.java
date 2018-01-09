@@ -19,12 +19,10 @@ public class GameModel extends Observable {
     public Pacman player;
     public List<Ghost> ghosts;
     public final long timeforeat,timeformove,timeforresp;
-    private boolean paused;
 
     public GameModel(long timeformove, long  timeforeat, long timeforresp) {
         score = 0;
         lives = 3;
-        paused = false;
         map = new Map();
         ghosts = new ArrayList<>();
         ghosts.add(new Ghost(map, 7, 4, Color.RED, map.view.FIELD_SIZE, timeformove, timeforeat, timeforresp));
@@ -57,14 +55,6 @@ public class GameModel extends Observable {
         if (score>=1000000) score = 999999;
         setChanged();
         notifyObservers(Boolean.FALSE);
-    }
-
-    public boolean isPaused() {
-        return paused;
-    }
-
-    public void setPaused(boolean paused) {
-        this.paused = paused;
     }
 
     public synchronized void endGame() {
