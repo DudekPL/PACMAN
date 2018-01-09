@@ -9,15 +9,13 @@ import java.util.Observer;
 
 public class LifeIcon extends JComponent implements Observer {
     private int fieldsize;
-    private int icosize;
     private int lives;
     private int posx;
     private int posy;
 
-    public LifeIcon(int x, int y, int l, int fs, int is){
+    public LifeIcon(int x, int y, int l, int fs){
         super();
         fieldsize = fs;
-        icosize = is;
         posx = x;
         posy = y;
         lives = l;

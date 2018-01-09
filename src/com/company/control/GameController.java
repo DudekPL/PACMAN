@@ -13,7 +13,7 @@ public class GameController {
         this.model = model;
     }
     public synchronized void eat() {
-        Inside i = model.map.controller.eat(model.player.model.getPosx(), model.player.model.getPosy(), (int)model.timeformove);
+        Inside i = model.map.controller.eat(model.player.model.getPosx(), model.player.model.getPosy());
         switch (i) {
             case EMPTY:
                 break;

@@ -27,7 +27,7 @@ public class PacmanController extends GhostController {
             if (d == Direction.RIGHT && map.model.field(x,y).model.canRight()) {model.changePos(d); return;}
             if (d == Direction.LEFT && map.model.field(x,y).model.canLeft()) {model.changePos(d); return;}
             if (d == Direction.DOWN && map.model.field(x,y).model.canDown()) {model.changePos(d); return;}
-            if (d == Direction.UP && map.model.field(x,y).model.canUp()) {model.changePos(d); return;}
+            if (d == Direction.UP && map.model.field(x,y).model.canUp()) {model.changePos(d);}
         }
     }
 

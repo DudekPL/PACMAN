@@ -37,7 +37,7 @@ public class FieldModel extends Observable {
         notifyObservers(Boolean.FALSE);
     }
 
-    public synchronized void initInside(Inside i) {
+    synchronized void initInside(Inside i) {
         inside = i;
         setChanged();
         notifyObservers(Boolean.TRUE);
@@ -63,19 +63,19 @@ public class FieldModel extends Observable {
         up = b;
     }
 
-    public void setDown(boolean b) {
+    void setDown(boolean b) {
         down = b;
     }
 
-    public void setLeft(boolean b) {
+    void setLeft(boolean b) {
         left = b;
     }
 
-    public void setRight(boolean b) {
+    void setRight(boolean b) {
         right = b;
     }
 
-    public boolean isEmpty() {
+    boolean isEmpty() {
         return (inside == Inside.EMPTY);
     }
 

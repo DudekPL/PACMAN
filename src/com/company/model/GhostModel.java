@@ -41,7 +41,10 @@ public class GhostModel extends Observable {
         return color;
     }
 
-    public synchronized void setActPos(int x, int y) {actposx = x; actposy = y;}
+    public synchronized void setActPos(int x, int y) {
+        actposx = x;
+        actposy = y;
+    }
 
     public synchronized int getPosx() {
         return posx;

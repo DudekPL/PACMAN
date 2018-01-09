@@ -12,10 +12,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class GhostController {
-    protected GhostModel model;
+    protected final GhostModel model;
     protected Map map;
-    protected int respx;
-    protected int respy;
+    private int respx;
+    private int respy;
     protected GhostSimpleView view;
 
     public GhostController(GhostModel gm, GhostSimpleView v, Map m, int rx, int ry) {
@@ -30,7 +30,7 @@ public class GhostController {
         model.setActPos(view.getActposx(), view.getActposy());
     }
 
-    public Direction nextMoveChasing(int x, int y) {
+    private Direction nextMoveChasing(int x, int y) {
         int posx,posy;
         posx = model.getPosx();
         posy = model.getPosy();
@@ -79,7 +79,6 @@ public class GhostController {
             }
         }
         while(v != null && v.parent !=null && (v.parent.coords.width != firstx || v.parent.coords.height != firsty)) {
-            if (v == null) break;
             v = v.parent;
         }
         if (v == null) return Direction.NONE;
@@ -90,7 +89,7 @@ public class GhostController {
         return Direction.NONE;
     }
 
-    public Direction nextMoveEatable(int x, int y) {
+    private Direction nextMoveEatable(int x, int y) {
         int posx, posy;
         synchronized (model) {
             posx = model.getPosx();
@@ -104,7 +103,7 @@ public class GhostController {
         return Direction.NONE;
     }
 
-    public Direction nextMoveRespawning() {
+    private Direction nextMoveRespawning() {
         int posx, posy, x, y;
         x=y=0;
         synchronized (model) {
@@ -128,11 +127,11 @@ public class GhostController {
         }
     }
 
-    public void makeEatable() {
+    void makeEatable() {
         if (model.getStatus() != State.RESPAWNING) model.makeEatable();
     }
 
-    public boolean collided() {
+    boolean collided() {
         boolean point = false;
         if (model.getStatus() == State.EATABLE) point = true;
         model.eaten(respx, respy);

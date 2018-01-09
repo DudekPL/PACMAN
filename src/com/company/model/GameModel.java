@@ -13,8 +13,8 @@ import java.util.Observable;
 
 
 public class GameModel extends Observable {
-    int score;
-    int lives;
+    private int score;
+    private int lives;
     public Map map;
     public Pacman player;
     public List<Ghost> ghosts;
@@ -57,7 +57,7 @@ public class GameModel extends Observable {
         notifyObservers(Boolean.FALSE);
     }
 
-    public synchronized void endGame() {
+    private synchronized void endGame() {
         SavingScore.upload(score);
         EndFlag.ending = true;
     }
