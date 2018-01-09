@@ -1,5 +1,11 @@
 package com.company;
 
+import com.company.util.EndFlag;
+import com.company.util.SavingScore;
+import com.company.util.keys.KeyActionGame;
+import com.company.util.keys.KeyActionMenu;
+import com.company.wrapper.Game;
+
 import javax.swing.*;
 import java.awt.*;
 
